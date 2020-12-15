@@ -1,5 +1,5 @@
 import styled from 'styled-components';
 
-export default styled.div`
+export const Button = styled.div`
   background: blue;
 `;
