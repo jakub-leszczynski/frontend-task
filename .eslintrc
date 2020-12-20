@@ -1,6 +1,10 @@
 {
   "plugins": ["jsx-a11y"],
-  "extends": ["airbnb-typescript", "plugin:jsx-a11y/recommended"],
+  "extends": [
+    "airbnb-typescript",
+    "plugin:jsx-a11y/recommended",
+    "plugin:react-hooks/recommended"
+  ],
   "parserOptions": {
     "project": "./tsconfig.json"
   },
