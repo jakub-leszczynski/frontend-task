@@ -1,15 +1,61 @@
+import { useState, useCallback, useEffect } from 'react';
+
 import SearchHistoryList from '../../components/SearchHistoryList/SearchHistoryList';
 import Input from '../../components/Input/Input';
 import Loader from '../../components/Loader/Loader';
+import Map from '../../components/Map/Map';
+import LocationDetails from '../../components/LocationDetails/LocationDetails';
+import Text from '../../components/Text/Text';
+import Button from '../../components/Button/Button';
+import { useMap } from '../../components/Map/Map.hooks';
 
 import * as S from './App.styles';
 import { useRequesterData } from '../../hooks/requests/useRequesterData';
+import { useLocationData } from '../../hooks/requests/useLocationData';
 
 const App:React.FC = () => {
+  const [searchText, setSearchText] = useState('');
   const {
+    execute: getRequesterData,
     data: requesterData,
     loading: requesterDataLoading,
   } = useRequesterData();
+
+  const {
+    execute: getLocationData,
+    data: searchLocationData,
+    loading: searchLocationLoading,
+  } = useLocationData(searchText);
+
+  useEffect(() => {
+    getRequesterData();
+  }, [getRequesterData]);
+
+  const [requesterViewport, handleSetRequesterViewport] = useMap({
+    latitude: requesterData?.latitude || 0,
+    longitude: requesterData?.longitude || 0,
+  });
+
+  const [searchLocationViewport, handleSetSearchLocationViewport] = useMap({
+    latitude: searchLocationData?.latitude || 0,
+    longitude: searchLocationData?.longitude || 0,
+  });
+
+  const handleSearchTextChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { value } = event.target;
+      setSearchText(value);
+    },
+    [],
+  );
+
+  const handleSearchTextSubmit = useCallback(
+    () => {
+      getLocationData();
+    },
+    [getLocationData],
+  );
+
   const searchHistoryList = [
     { id: 'abc' },
     { id: 'cde' },
@@ -21,27 +67,35 @@ const App:React.FC = () => {
           <SearchHistoryList items={searchHistoryList} />
         </S.SearchHistory>
         <S.CurrentLocationMap>
-          Location map
+          <Loader loading={requesterDataLoading}>
+            <Map viewport={requesterViewport} setViewport={handleSetRequesterViewport} />
+          </Loader>
         </S.CurrentLocationMap>
         <S.CurrentLocationDetails>
           <Loader loading={requesterDataLoading}>
-            <div>Your location details:</div>
-            <div>{`IP Address: ${requesterData?.ip}`}</div>
-            <div>{`Country: ${requesterData?.countryName}`}</div>
-            <div>{`City: ${requesterData?.city}`}</div>
-            <div>{`Latitude: ${requesterData?.latitude}`}</div>
-            <div>{`Longitude: ${requesterData?.longitude}`}</div>
+            <LocationDetails locationData={requesterData || undefined} />
           </Loader>
         </S.CurrentLocationDetails>
         <S.SearchInput>
-          Search Input
-          <Input />
+          <Input
+            value={searchText}
+            handleChange={handleSearchTextChange}
+            placeholder="217.96.128.237"
+            handleSubmit={handleSearchTextSubmit}
+          />
+          <Button handleClick={handleSearchTextSubmit}>
+            <Text>Search</Text>
+          </Button>
         </S.SearchInput>
         <S.HistoryLocationMap>
-          History location map
+          <Loader loading={searchLocationLoading}>
+            <Map viewport={searchLocationViewport} setViewport={handleSetSearchLocationViewport} />
+          </Loader>
         </S.HistoryLocationMap>
         <S.HistoryLocationDetails>
-          HistoryLocationDetails
+          <Loader loading={searchLocationLoading}>
+            <LocationDetails locationData={searchLocationData || undefined} />
+          </Loader>
         </S.HistoryLocationDetails>
       </S.GridLayout>
     </S.AppStretch>

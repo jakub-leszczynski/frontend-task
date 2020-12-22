@@ -60,3 +60,7 @@ export interface RequesterData {
 export interface RequesterDataResponse extends AxiosResponse {
   data: RequesterData
 }
+
+export interface LocationDataResponse extends AxiosResponse {
+  data: RequesterData
+}

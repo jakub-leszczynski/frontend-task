@@ -1,10 +1,11 @@
 import { AxiosResponse } from 'axios';
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 export interface ResponseState {
   data: any,
   loading: boolean,
   error: Error | null,
+  execute: () => void
 }
 
 export const useRequest = (request: () => Promise<AxiosResponse>): ResponseState => {
@@ -12,8 +13,8 @@ export const useRequest = (request: () => Promise<AxiosResponse>): ResponseState
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    (async () => {
+  const execute = useCallback(
+    async () => {
       try {
         setData(null);
         setError(null);
@@ -26,12 +27,14 @@ export const useRequest = (request: () => Promise<AxiosResponse>): ResponseState
       } finally {
         setLoading(false);
       }
-    })();
-  }, [request]);
+    },
+    [request],
+  );
 
   return {
     data,
     loading,
     error,
+    execute,
   };
 };

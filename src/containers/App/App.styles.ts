@@ -19,6 +19,9 @@ export const GridLayout = styled.div`
 
 export const CurrentLocationMap = styled.div`
   grid-area: CurrentLocationMap;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 export const CurrentLocationDetails = styled.div`

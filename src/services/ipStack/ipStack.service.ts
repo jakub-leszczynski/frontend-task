@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { keysSnakeToCamelCase } from '../../utils/object';
-import { RequesterDataResponse } from './ipStack.types';
+import { LocationDataResponse, RequesterDataResponse } from './ipStack.types';
 
 class IpStackService {
   instance: AxiosInstance;
@@ -19,8 +19,16 @@ class IpStackService {
   }
 
   getRequesterData = async (): Promise<RequesterDataResponse> => {
-    const checkEndpoint = '/check';
-    const response = await this.instance.get(checkEndpoint);
+    const endpoint = '/check';
+    const response = await this.instance.get(endpoint);
+    return {
+      ...response,
+      data: keysSnakeToCamelCase(response.data),
+    };
+  };
+
+  getLocationDataByIp = async (searchText: string): Promise<LocationDataResponse> => {
+    const response = await this.instance.get(`/${searchText}`);
     return {
       ...response,
       data: keysSnakeToCamelCase(response.data),
